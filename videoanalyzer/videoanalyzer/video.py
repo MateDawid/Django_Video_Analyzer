@@ -16,27 +16,23 @@ class VideoCamera:
             self.colorMethod = cv2.COLOR_BGR2GRAY
 
     def get_frame(self):
-        grabbed, frame = self.video.read() #stay
-        width = int(self.video.get(3))
+        grabbed, frame = self.video.read()
+        width = int(self.video.get(3))*2
         height = int(self.video.get(4))
 
-        image = np.zeros(frame.shape, np.uint8)
-        smaller_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-        image[:height//2, :width//2] = smaller_frame
-        _, jpeg = cv2.imencode('.jpg', image) #stay with frame
+        # _, clean_jpeg = cv2.imencode('.jpg', frame)
+        # clean = clean_jpeg.tobytes()
+        if self.colorMethod is not None:
+            processed = cv2.cvtColor(frame, self.colorMethod)
+            print(processed.shape)
+        else:
+            processed = frame
+
+        output = np.zeros((height, width, frame.shape[2]), np.uint8)
+        output[:height, :width // 2] = frame
+        output[:height, width // 2:] = processed
+        _, jpeg = cv2.imencode('.jpg', output)
         return jpeg.tobytes()
-
-
-
-        # clean = jpeg.tobytes()
-        # if self.colorMethod is not None:
-        #     _, processed_jpeg = cv2.imencode('.jpg', cv2.cvtColor(frame, self.colorMethod))
-        #     processed = processed_jpeg.tobytes()
-        # else:
-        #     _, processed_jpeg = cv2.imencode('.jpg', frame)
-        #     processed = processed_jpeg.tobytes()
-        # return [clean, processed]
-
 
 
 def gen(camera):
