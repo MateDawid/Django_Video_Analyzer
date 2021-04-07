@@ -6,14 +6,36 @@ class VideoCamera:
     def __init__(self):
         self.video = cv2.VideoCapture(0)
         self.colorMethod = None
-        self.frame_to_display = None
+        self.processed = None
 
     def __del__(self):
         self.video.release()
 
-    def set_color_method(self, colorMethod):
-        if colorMethod == "gray":
-            self.colorMethod = cv2.COLOR_BGR2GRAY
+    def detect_circles(self, image, dp=1, minDist=20, param1=50, param2=70, minRadius=20, maxRadius=100):
+        # Convert to grayscale.
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # Blur using 3 * 3 kernel.
+        gray_blurred = cv2.blur(gray, (3, 3))
+        # Apply Hough transform on the blurred image.
+        detected_circles = cv2.HoughCircles(image=gray_blurred,
+                                            method=cv2.HOUGH_GRADIENT,
+                                            dp=dp,  # inverse resolution ratio
+                                            minDist=minDist,  # min distance between two circles centers
+                                            param1=param1,
+                                            param2=param2,
+                                            minRadius=minRadius,
+                                            maxRadius=maxRadius)
+        if detected_circles is not None:
+
+            # Convert the circle parameters a, b and r to round integers.
+            detected_circles = np.uint16(np.around(detected_circles))
+
+            for pt in detected_circles[0, :]:
+                a, b, r = pt[0], pt[1], pt[2]
+
+                # Draw the circumference of the circle.
+                cv2.circle(image, (a, b), r, (0, 255, 0), 2)
+                cv2.circle(image, (a, b), 1, (0, 0, 255), 3)
 
     @staticmethod
     def get_text_size(text):
@@ -28,18 +50,16 @@ class VideoCamera:
         cv2.putText(image, text, (x, y + text_height), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
 
     def get_frame(self):
-        grabbed, frame = self.video.read()
+        _, frame = self.video.read()
         width = int(self.video.get(3))*2
         height = int(self.video.get(4))
 
-        # _, clean_jpeg = cv2.imencode('.jpg', frame)
-        # clean = clean_jpeg.tobytes()
         if self.colorMethod is not None:
             processed = cv2.cvtColor(frame, self.colorMethod)
-            print(processed.shape)
+
         else:
-            #usunąć trzeci parametr z frame.shape?
-            processed = frame
+            processed = frame.copy()
+            # self.detect_circles(processed)
 
         output = np.zeros((height, width, frame.shape[2]), np.uint8)
         output[:height, :width // 2] = frame
