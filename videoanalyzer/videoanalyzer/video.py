@@ -7,6 +7,8 @@ class VideoCamera:
         self.video = cv2.VideoCapture(0)
         self.colorMethod = None
         self.processed = None
+        self.colorDetection = None
+        self.shapeDetection = None
 
     def __del__(self):
         self.video.release()
@@ -56,10 +58,11 @@ class VideoCamera:
 
         if self.colorMethod is not None:
             processed = cv2.cvtColor(frame, self.colorMethod)
+            self.detect_circles(processed)
 
         else:
             processed = frame.copy()
-            # self.detect_circles(processed)
+            self.detect_circles(processed)
 
         output = np.zeros((height, width, frame.shape[2]), np.uint8)
         output[:height, :width // 2] = frame
