@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <img src="{% url 'clean_feed' %}">
+    {% if mode == 'shape' %}
+        <img src="{% url 'shape_feed' %}">
+    {% else %}
+        <img src="{% url 'clean_feed' %}">
+    {% endif %}
+
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-    <input type="submit" value="Create" />
+        <input type="submit" value="Apply" />
     </form>
 </body>
 </html>

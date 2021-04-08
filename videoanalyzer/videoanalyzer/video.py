@@ -3,12 +3,12 @@ import numpy as np
 
 
 class VideoCamera:
-    def __init__(self):
+    def __init__(self, shapeDetection=None):
         self.video = cv2.VideoCapture(0)
         self.colorMethod = None
         self.processed = None
         self.colorDetection = None
-        self.shapeDetection = None
+        self.shapeDetection = shapeDetection
 
     def __del__(self):
         self.video.release()
@@ -56,13 +56,12 @@ class VideoCamera:
         width = int(self.video.get(3))*2
         height = int(self.video.get(4))
 
-        if self.colorMethod is not None:
-            processed = cv2.cvtColor(frame, self.colorMethod)
+        if self.shapeDetection == "circle":
+            processed = frame.copy()
             self.detect_circles(processed)
 
         else:
             processed = frame.copy()
-            self.detect_circles(processed)
 
         output = np.zeros((height, width, frame.shape[2]), np.uint8)
         output[:height, :width // 2] = frame
