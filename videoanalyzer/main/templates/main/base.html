@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
 </head>
 <body>
-    {% if mode == 'shape' %}
-        <img src="{% url 'shape_feed' %}">
-    {% else %}
-        <img src="{% url 'clean_feed' %}">
-    {% endif %}
-
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Apply" />
-    </form>
+    <ul>
+        <li><button onclick="location.href='{% url 'home' %}'" type="button">Home page</button></li>
+        <li><button onclick="location.href='{% url 'shape' %}'" type="button">Shape detection</button></li>
+    </ul>
+    <div>
+        {% block content %}
+        {% endblock %}
+    </div>
 </body>
 </html>

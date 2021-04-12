@@ -1,0 +1,9 @@
+{% extends 'main/base.html' %}
+{% block title %} DWA | Shape detection{% endblock %}
+
+{% block content %}
+    <h1>SHAPE DETECTION</h1>
+    <ul>
+        <li><button onclick="location.href='{% url 'circle' %}'" type="button">Circle detection</button></li>
+    </ul>
+{% endblock %}
