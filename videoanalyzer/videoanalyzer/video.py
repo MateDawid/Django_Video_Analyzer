@@ -3,17 +3,24 @@ import numpy as np
 
 
 class VideoCamera:
-    def __init__(self, shapeDetection=None):
+    def __init__(self, shapeDetection=None, dp=None, minDist=None, param1=None, param2=None, minRadius=None, maxRadius=None):
         self.video = cv2.VideoCapture(0)
         self.colorMethod = None
         self.processed = None
         self.colorDetection = None
         self.shapeDetection = shapeDetection
+        # Circle detection variables
+        self.dp = dp
+        self.minDist = minDist
+        self.param1 = param1
+        self.param2 = param2
+        self.minRadius = minRadius
+        self.maxRadius = maxRadius
 
     def __del__(self):
         self.video.release()
 
-    def detect_circles(self, image, dp=1, minDist=20, param1=50, param2=70, minRadius=20, maxRadius=100):
+    def detect_circles(self, image):
         # Convert to grayscale.
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         # Blur using 3 * 3 kernel.
@@ -21,12 +28,12 @@ class VideoCamera:
         # Apply Hough transform on the blurred image.
         detected_circles = cv2.HoughCircles(image=gray_blurred,
                                             method=cv2.HOUGH_GRADIENT,
-                                            dp=dp,  # inverse resolution ratio
-                                            minDist=minDist,  # min distance between two circles centers
-                                            param1=param1,
-                                            param2=param2,
-                                            minRadius=minRadius,
-                                            maxRadius=maxRadius)
+                                            dp=self.dp,  # inverse resolution ratio
+                                            minDist=self.minDist,  # min distance between two circles centers
+                                            param1=self.param1,
+                                            param2=self.param2,
+                                            minRadius=self.minRadius,
+                                            maxRadius=self.maxRadius)
         if detected_circles is not None:
 
             # Convert the circle parameters a, b and r to round integers.
