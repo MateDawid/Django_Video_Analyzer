@@ -9,10 +9,10 @@ from .forms import CircleDetectionForm
 
 @gzip.gzip_page
 def feed(request):
+    print(dict(request.session))
     if dict(request.session) != {}:
         if request.session['circle_detection'] != {}:
             try:
-                print(dict(request.session))
                 data = request.session['circle_detection']
                 cam = VideoCamera(shapeDetection="circle",
                                   dp=float(data['dp']),
@@ -24,14 +24,13 @@ def feed(request):
                 del request.session['circle_detection']
                 return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
             except:  # This is bad! replace it with proper handling
-                pass
-    else:
-        try:
-            print(dict(request.session))
-            cam = VideoCamera(shapeDetection="triangle")
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            pass
+                print("Circle = Lack of camera")
+        else:
+            try:
+                cam = VideoCamera(shapeDetection="triangle")
+                return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+            except:  # This is bad! replace it with proper handling
+                print("Lack of camera")
 
 
 def home(request):
@@ -49,6 +48,7 @@ def detect_circle(request):
     else:
         request.session["circle_detection"] = {}
     return render(request, "main/circle.html", {"circle_form": circle_form})
+
 
 def detect_triangle(request):
     # triangle_form = TriangleDetectionForm(request.POST or None, request.FILES or None)
