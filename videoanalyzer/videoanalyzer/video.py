@@ -46,6 +46,23 @@ class VideoCamera:
                 cv2.circle(image, (a, b), r, (0, 255, 0), 2)
                 cv2.circle(image, (a, b), 1, (0, 0, 255), 3)
 
+    def detect_triangles(self, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        kernel = np.ones((4, 4), np.uint8)
+        dilation = cv2.dilate(gray, kernel, iterations=1)
+        blur = cv2.GaussianBlur(dilation, (5, 5), 0)
+        thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
+
+        # Now finding Contours
+        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        coordinates = []
+        for cnt in contours:
+            # [point_x, point_y, width, height] = cv2.boundingRect(cnt)
+            approx = cv2.approxPolyDP(cnt, 0.015 * cv2.arcLength(cnt, True), True)
+            if len(approx) == 3:
+                coordinates.append([cnt])
+                cv2.drawContours(image, [cnt], 0, (0, 255, 0), 2)
+
     @staticmethod
     def get_text_size(text):
         text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, 1, 2)
@@ -66,6 +83,10 @@ class VideoCamera:
         if self.shapeDetection == "circle":
             processed = frame.copy()
             self.detect_circles(processed)
+
+        elif self.shapeDetection == "triangle":
+            processed = frame.copy()
+            self.detect_triangles(processed)
 
         else:
             processed = frame.copy()
