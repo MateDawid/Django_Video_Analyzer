@@ -1,5 +1,5 @@
 from django import forms
-from .models import CircleDetectionModel
+from .models import CircleDetectionModel, TriangleDetectionModel
 
 
 # class DisplayForm(forms.ModelForm):
@@ -10,4 +10,9 @@ from .models import CircleDetectionModel
 class CircleDetectionForm(forms.ModelForm):
     class Meta:
         model = CircleDetectionModel
+        fields = '__all__'
+
+class TriangleDetectionForm(forms.ModelForm):
+    class Meta:
+        model = TriangleDetectionModel
         fields = '__all__'

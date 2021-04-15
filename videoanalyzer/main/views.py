@@ -4,33 +4,43 @@ from django.views.generic import CreateView
 from django.http import StreamingHttpResponse
 from videoanalyzer.video import VideoCamera, gen
 
-# from .models import DisplayModel
-from .forms import CircleDetectionForm
+from .forms import CircleDetectionForm, TriangleDetectionForm
 
 @gzip.gzip_page
 def feed(request):
     print(dict(request.session))
-    if dict(request.session) != {}:
-        if request.session['circle_detection'] != {}:
-            try:
-                data = request.session['circle_detection']
-                cam = VideoCamera(shapeDetection="circle",
-                                  dp=float(data['dp']),
-                                  minDist=float(data['minDist']),
-                                  param1=float(data['param1']),
-                                  param2=float(data['param2']),
-                                  minRadius=int(data['minRadius']),
-                                  maxRadius=int(data['maxRadius']))
-                del request.session['circle_detection']
-                return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-            except:  # This is bad! replace it with proper handling
-                print("Circle = Lack of camera")
-        else:
-            try:
-                cam = VideoCamera(shapeDetection="triangle")
-                return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-            except:  # This is bad! replace it with proper handling
-                print("Lack of camera")
+    if request.session['circle_detection'] != {}:
+        try:
+            data = request.session['circle_detection']
+            cam = VideoCamera(shapeDetection="circle",
+                                dp=float(data['dp']),
+                                minDist=float(data['minDist']),
+                                param1=float(data['param1']),
+                                param2=float(data['param2']),
+                                minRadius=int(data['minRadius']),
+                                maxRadius=int(data['maxRadius']))
+            request.session['circle_detection'] = {}
+            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+        except:  # This is bad! replace it with proper handling
+            print("Circle = Lack of camera")
+    elif request.session['triangle_detection'] != {}:
+        try:
+            data = request.session['triangle_detection']
+            cam = VideoCamera(shapeDetection="triangle",
+                              kernelShape=int(data['kernelShape']),
+                              approximation=float(data['approximation']),
+                              maxArea=float(data['maxArea']))
+            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+            request.session['triangle_detection'] = {}
+        except:  # This is bad! replace it with proper handling
+            print("Triangle = Lack of camera")
+
+    else:
+        try:
+            cam = VideoCamera()
+            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+        except:  # This is bad! replace it with proper handling
+            print("Lack of camera")
 
 
 def home(request):
@@ -51,9 +61,9 @@ def detect_circle(request):
 
 
 def detect_triangle(request):
-    # triangle_form = TriangleDetectionForm(request.POST or None, request.FILES or None)
-    # if request.method == 'POST':
-    #     request.session["triangle_detection"] = request.POST
-    # else:
-    #     request.session["triangle_detection"] = {}
-    return render(request, "main/triangle.html")  # ,{"triangle_form": triangle_form})
+    triangle_form = TriangleDetectionForm(request.POST or None, request.FILES or None)
+    if request.method == 'POST':
+        request.session["triangle_detection"] = request.POST
+    else:
+        request.session["triangle_detection"] = {}
+    return render(request, "main/triangle.html", {"triangle_form": triangle_form})

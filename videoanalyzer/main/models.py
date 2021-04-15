@@ -20,3 +20,9 @@ class CircleDetectionModel(models.Model):
     param2 = models.FloatField(default=70)
     minRadius = models.IntegerField(default=20)
     maxRadius = models.IntegerField(default=100)
+
+
+class TriangleDetectionModel(models.Model):
+    kernelShape = models.IntegerField(default=4)
+    approximation = models.FloatField(default=0.02)
+    maxArea = models.FloatField(default=400)

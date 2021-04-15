@@ -3,7 +3,19 @@ import numpy as np
 
 
 class VideoCamera:
-    def __init__(self, shapeDetection=None, dp=None, minDist=None, param1=None, param2=None, minRadius=None, maxRadius=None):
+    def __init__(
+            self,
+            # Circle detection
+            shapeDetection=None,
+            dp=None, minDist=None,
+            param1=None, param2=None,
+            minRadius=None,
+            maxRadius=None,
+            # Triangle detection
+            kernelShape=None,
+            approximation=None,
+            maxArea=None
+    ):
         self.video = cv2.VideoCapture(0)
         self.colorMethod = None
         self.processed = None
@@ -16,6 +28,9 @@ class VideoCamera:
         self.param2 = param2
         self.minRadius = minRadius
         self.maxRadius = maxRadius
+        self.kernelShape = kernelShape
+        self.approximation = approximation
+        self.maxArea = maxArea
 
     def __del__(self):
         self.video.release()
@@ -48,15 +63,17 @@ class VideoCamera:
 
     def detect_triangles(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        kernel = np.ones((5, 5), np.uint8)
-        dilation = cv2.dilate(gray, kernel, iterations=1)
+        kernel = np.ones((self.kernelShape, self.kernelShape), np.uint8)
+        erosion = cv2.erode(gray, kernel, iterations=1)
+        dilation = cv2.dilate(erosion, kernel, iterations=1)
         blur = cv2.GaussianBlur(dilation, (5, 5), 0)
         thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
-        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
-            if area > 400:
+            if area > self.maxArea:
+                epsilon = self.approximation * cv2.arcLength(cnt, True)
+                approx = cv2.approxPolyDP(cnt, epsilon, True)
                 if len(approx) == 3:
                     cv2.drawContours(image, [approx], 0, (0, 255, 0), -1)
 
@@ -74,7 +91,7 @@ class VideoCamera:
 
     def get_frame(self):
         _, frame = self.video.read()
-        width = int(self.video.get(3))*2
+        width = int(self.video.get(3)) * 2
         height = int(self.video.get(4))
 
         if self.shapeDetection == "circle":
@@ -97,12 +114,12 @@ class VideoCamera:
         input_text_w, input_text_h = VideoCamera.get_text_size('INPUT')
         output_text_w, output_text_h = VideoCamera.get_text_size('OUTPUT')
 
-        #displying texts backgrounds
+        # displying texts backgrounds
 
-        VideoCamera.display_text(output, 'INPUT', (0,0), input_text_w, input_text_h)
-        VideoCamera.display_text(output, 'OUTPUT', (width//2, 0), output_text_w, output_text_h)
+        VideoCamera.display_text(output, 'INPUT', (0, 0), input_text_w, input_text_h)
+        VideoCamera.display_text(output, 'OUTPUT', (width // 2, 0), output_text_w, output_text_h)
 
-        #extract image to .jpg format
+        # extract image to .jpg format
         _, jpeg = cv2.imencode('.jpg', output)
 
         return jpeg.tobytes()
@@ -111,5 +128,5 @@ class VideoCamera:
 def gen(camera):
     while True:
         frame = camera.get_frame()
-        yield(b'--frame\r\n'
-              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
