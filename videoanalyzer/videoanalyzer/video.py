@@ -77,6 +77,22 @@ class VideoCamera:
                 if len(approx) == 3:
                     cv2.drawContours(image, [approx], 0, (0, 255, 0), -1)
 
+    def detect_squares(self, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        kernel = np.ones((4, 4), np.uint8)
+        erosion = cv2.erode(gray, kernel, iterations=1)
+        dilation = cv2.dilate(erosion, kernel, iterations=1)
+        blur = cv2.GaussianBlur(dilation, (5, 5), 0)
+        thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area > 400:
+                epsilon = 0.02 * cv2.arcLength(cnt, True)
+                approx = cv2.approxPolyDP(cnt, epsilon, True)
+                if len(approx) == 4:
+                    cv2.drawContours(image, [approx], 0, (0, 255, 0), -1)
+
     @staticmethod
     def get_text_size(text):
         text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, 1, 2)
@@ -101,6 +117,10 @@ class VideoCamera:
         elif self.shapeDetection == "triangle":
             processed = frame.copy()
             self.detect_triangles(processed)
+
+        elif self.shapeDetection == "square":
+            processed = frame.copy()
+            self.detect_squares(processed)
 
         else:
             processed = frame.copy()

@@ -37,7 +37,7 @@ def feed(request):
 
     else:
         try:
-            cam = VideoCamera()
+            cam = VideoCamera(shapeDetection="square")
             return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
         except:  # This is bad! replace it with proper handling
             print("Lack of camera")
@@ -67,3 +67,11 @@ def detect_triangle(request):
     else:
         request.session["triangle_detection"] = {}
     return render(request, "main/triangle.html", {"triangle_form": triangle_form})
+
+def detect_square(request):
+    # square_form = SquareDetectionForm(request.POST or None, request.FILES or None)
+    if request.method == 'POST':
+        request.session["square_detection"] = request.POST
+    else:
+        request.session["square_detection"] = {}
+    return render(request, "main/square.html")  #, {"square_form": square_form})
