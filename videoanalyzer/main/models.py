@@ -22,7 +22,7 @@ class CircleDetectionModel(models.Model):
     maxRadius = models.IntegerField(default=100)
 
 
-class TriangleDetectionModel(models.Model):
+class TriangleAndSquareDetectionModel(models.Model):
     kernelShape = models.IntegerField(default=4)
     approximation = models.FloatField(default=0.02)
     maxArea = models.FloatField(default=400)

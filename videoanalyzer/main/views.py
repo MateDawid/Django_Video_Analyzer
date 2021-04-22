@@ -4,7 +4,7 @@ from django.views.generic import CreateView
 from django.http import StreamingHttpResponse
 from videoanalyzer.video import VideoCamera, gen
 
-from .forms import CircleDetectionForm, TriangleDetectionForm
+from .forms import CircleDetectionForm, TriangleAndSquareCDetectionForm
 
 @gzip.gzip_page
 def feed(request):
@@ -34,10 +34,20 @@ def feed(request):
             request.session['triangle_detection'] = {}
         except:  # This is bad! replace it with proper handling
             print("Triangle = Lack of camera")
-
+    elif request.session['square_detection'] != {}:
+        try:
+            data = request.session['square_detection']
+            cam = VideoCamera(shapeDetection="square",
+                              kernelShape=int(data['kernelShape']),
+                              approximation=float(data['approximation']),
+                              maxArea=float(data['maxArea']))
+            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+            request.session['square_detection'] = {}
+        except:  # This is bad! replace it with proper handling
+            print("Square = Lack of camera")
     else:
         try:
-            cam = VideoCamera(shapeDetection="square")
+            cam = VideoCamera()
             return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
         except:  # This is bad! replace it with proper handling
             print("Lack of camera")
@@ -61,17 +71,18 @@ def detect_circle(request):
 
 
 def detect_triangle(request):
-    triangle_form = TriangleDetectionForm(request.POST or None, request.FILES or None)
+    triangle_form = TriangleAndSquareCDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["triangle_detection"] = request.POST
     else:
         request.session["triangle_detection"] = {}
     return render(request, "main/triangle.html", {"triangle_form": triangle_form})
 
+
 def detect_square(request):
-    # square_form = SquareDetectionForm(request.POST or None, request.FILES or None)
+    square_form = TriangleAndSquareCDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["square_detection"] = request.POST
     else:
         request.session["square_detection"] = {}
-    return render(request, "main/square.html")  #, {"square_form": square_form})
+    return render(request, "main/square.html", {"square_form": square_form})
