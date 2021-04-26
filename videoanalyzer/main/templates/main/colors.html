@@ -2,12 +2,8 @@
 {% block title %} DWA | Colors detection{% endblock %}
 
 {% block content %}
-    <h1>Colors DETECTION</h1>
-    <img src="{% url 'feed' %}">
+    <h1>COLOR DETECTION</h1>
+    <button onclick="location.href='{% url 'color_rgb' %}'" type="button">Detect color by RGB</button>
+    <button onclick="location.href='{% url 'color_hsv' %}'" type="button">Detect color by HSV</button>
 
-<!--    <form action = "" method = "post">-->
-<!--        {% csrf_token %}-->
-<!--        {{colors_form.as_p }}-->
-<!--        <input type="submit" value="Submit">-->
-<!--    </form>-->
 {% endblock %}

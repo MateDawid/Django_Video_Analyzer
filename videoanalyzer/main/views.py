@@ -48,7 +48,7 @@ def feed(request):
 
     else:
         try:
-            cam = VideoCamera(colorDetection=True)
+            cam = VideoCamera(colorDetection="HSV")
             return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
         except:  # This is bad! replace it with proper handling
             print("Lack of camera")
@@ -61,11 +61,18 @@ def home(request):
 def shape(request):
     return render(request, "main/shape.html")
 
+def color(request):
+    return render(request, "main/colors.html")
+
+
 def reset_session(request):
     request.session["circle_detection"] = {}
     request.session["triangle_detection"] = {}
     request.session["square_detection"] = {}
     request.session["color_detection"] = {}
+    request.session["color_detection_hsv"] = {}
+    request.session["color_detection_rgb"] = {}
+
 
 def detect_circle(request):
     reset_session(request)
@@ -95,11 +102,21 @@ def detect_square(request):
     return render(request, "main/square.html", {"square_form": square_form})
 
 
-def detect_color(request):
+def detect_color_by_hsv(request):
     reset_session(request)
-    # colors_form = ColorsDetectionForm(request.POST or None, request.FILES or None)
+    # colors_form = HSVColorsDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
-        request.session["color_detection"] = request.POST
+        request.session["color_detection_hsv"] = request.POST
     else:
-        request.session["color_detection"] = {}
-    return render(request, "main/colors.html")  # , {"colors_form": colors_form})
+        request.session["color_detection_hsv"] = {}
+    return render(request, "main/colors_hsv.html")  # , {"colors_form_hsv": colors_form_hsv})
+
+
+def detect_color_by_rgb(request):
+    reset_session(request)
+    # colors_form = RGBColorsDetectionForm(request.POST or None, request.FILES or None)
+    if request.method == 'POST':
+        request.session["color_detection_rgb"] = request.POST
+    else:
+        request.session["color_detection_rgb"] = {}
+    return render(request, "main/colors_rgb.html")  # , {"colors_form_rgb": colors_form_rgb})

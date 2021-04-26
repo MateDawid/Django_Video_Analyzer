@@ -5,8 +5,9 @@ import numpy as np
 class VideoCamera:
     def __init__(
             self,
-            # Circle detection
             shapeDetection=None,
+            colorDetection=None,
+            # Circle detection
             dp=None, minDist=None,
             param1=None, param2=None,
             minRadius=None,
@@ -15,18 +16,25 @@ class VideoCamera:
             kernelShape=None,
             approximation=None,
             maxArea=None,
-            # Colors detection
-            colorDetection=False,
+            # Colors detection by RGB
             red_min=None,
             green_min=None,
             blue_min=None,
             red_max=None,
             green_max=None,
             blue_max=None,
+            # Colors detection by RGB
+            hue_min=None,
+            saturation_min=None,
+            value_min=None,
+            hue_max=None,
+            saturation_max=None,
+            value_max=None,
 
     ):
         self.video = cv2.VideoCapture(0)
         self.shapeDetection = shapeDetection
+        self.colorDetection = colorDetection
         # Circle detection variables
         self.dp = dp
         self.minDist = minDist
@@ -38,14 +46,20 @@ class VideoCamera:
         self.kernelShape = kernelShape
         self.approximation = approximation
         self.maxArea = maxArea
-        # Color detection variables
-        self.colorDetection = colorDetection
+        # Color detection by RGB variables
         self.red_min = red_min,
         self.green_min = green_min,
         self.blue_min = blue_min,
         self.red_max = red_max,
         self.green_max = green_max,
         self.blue_max = blue_max,
+        # Color detection by HSV variables
+        self.hue_min = hue_min,
+        self.saturation_min = saturation_min,
+        self.value_min = value_min,
+        self.hue_max = hue_max,
+        self.saturation_max = saturation_max,
+        self.value_max = value_max,
 
     def __del__(self):
         self.video.release()
@@ -107,10 +121,24 @@ class VideoCamera:
                     if 0.95 <= circle_check < 1.05:
                         cv2.drawContours(image, [approx], 0, (0, 255, 0), -1)
 
-    def detect_color(self, image):
+    def detect_color_by_hsv(self, image):
         hsv_frame = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        low_range = np.array([40, 0, 0])
+        low_range = np.array([40, 50, 50])
         high_range = np.array([80, 255, 255])
+        mask = cv2.inRange(hsv_frame, low_range, high_range)
+        output = cv2.bitwise_and(image, image, mask=mask)
+        return output
+
+    @staticmethod
+    def convert_rgb_to_hsv(red, green, blue):
+        bgr_color = np.uint8([[[blue, green, red]]])
+        hsv_color = cv2.cvtColor(bgr_color, cv2.COLOR_BGR2HSV)
+        return hsv_color[0][0]
+
+    def detect_color_by_rgb(self, image):
+        hsv_frame = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        low_range = np.array(self.convert_rgb_to_hsv(self.red_min, self.green_min, self.blue_min))
+        high_range = np.array(self.convert_rgb_to_hsv(self.red_max, self.green_max, self.blue_max))
         mask = cv2.inRange(hsv_frame, low_range, high_range)
         output = cv2.bitwise_and(image, image, mask=mask)
         return output
@@ -144,8 +172,11 @@ class VideoCamera:
             processed = frame.copy()
             self.detect_squares(processed)
 
-        elif self.colorDetection == True:
-            processed = self.detect_color(frame.copy())
+        elif self.colorDetection == "HSV":
+            processed = self.detect_color_by_hsv(frame.copy())
+
+        elif self.colorDetection == "RGB":
+            processed = self.detect_color_by_rgb(frame.copy())
 
         else:
             processed = frame.copy()
