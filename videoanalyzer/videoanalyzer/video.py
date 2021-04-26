@@ -11,15 +11,21 @@ class VideoCamera:
             param1=None, param2=None,
             minRadius=None,
             maxRadius=None,
-            # Triangle detection
+            # Triangle/Square detection
             kernelShape=None,
             approximation=None,
-            maxArea=None
+            maxArea=None,
+            # Colors detection
+            colorDetection=False,
+            red_min=None,
+            green_min=None,
+            blue_min=None,
+            red_max=None,
+            green_max=None,
+            blue_max=None,
+
     ):
         self.video = cv2.VideoCapture(0)
-        self.colorMethod = None
-        self.processed = None
-        self.colorDetection = None
         self.shapeDetection = shapeDetection
         # Circle detection variables
         self.dp = dp
@@ -28,9 +34,18 @@ class VideoCamera:
         self.param2 = param2
         self.minRadius = minRadius
         self.maxRadius = maxRadius
+        # Triangle/Square detection variables
         self.kernelShape = kernelShape
         self.approximation = approximation
         self.maxArea = maxArea
+        # Color detection variables
+        self.colorDetection = colorDetection
+        self.red_min = red_min,
+        self.green_min = green_min,
+        self.blue_min = blue_min,
+        self.red_max = red_max,
+        self.green_max = green_max,
+        self.blue_max = blue_max,
 
     def __del__(self):
         self.video.release()
@@ -92,6 +107,14 @@ class VideoCamera:
                     if 0.95 <= circle_check < 1.05:
                         cv2.drawContours(image, [approx], 0, (0, 255, 0), -1)
 
+    def detect_color(self, image):
+        hsv_frame = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        low_range = np.array([40, 0, 0])
+        high_range = np.array([80, 255, 255])
+        mask = cv2.inRange(hsv_frame, low_range, high_range)
+        output = cv2.bitwise_and(image, image, mask=mask)
+        return output
+
     @staticmethod
     def get_text_size(text):
         text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, 1, 2)
@@ -120,6 +143,9 @@ class VideoCamera:
         elif self.shapeDetection == "square":
             processed = frame.copy()
             self.detect_squares(processed)
+
+        elif self.colorDetection == True:
+            processed = self.detect_color(frame.copy())
 
         else:
             processed = frame.copy()

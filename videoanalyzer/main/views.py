@@ -45,9 +45,10 @@ def feed(request):
             request.session['square_detection'] = {}
         except:  # This is bad! replace it with proper handling
             print("Square = Lack of camera")
+
     else:
         try:
-            cam = VideoCamera()
+            cam = VideoCamera(colorDetection=True)
             return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
         except:  # This is bad! replace it with proper handling
             print("Lack of camera")
@@ -60,17 +61,22 @@ def home(request):
 def shape(request):
     return render(request, "main/shape.html")
 
+def reset_session(request):
+    request.session["circle_detection"] = {}
+    request.session["triangle_detection"] = {}
+    request.session["square_detection"] = {}
+    request.session["color_detection"] = {}
 
 def detect_circle(request):
+    reset_session(request)
     circle_form = CircleDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["circle_detection"] = request.POST
-    else:
-        request.session["circle_detection"] = {}
     return render(request, "main/circle.html", {"circle_form": circle_form})
 
 
 def detect_triangle(request):
+    reset_session(request)
     triangle_form = TriangleAndSquareCDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["triangle_detection"] = request.POST
@@ -80,9 +86,20 @@ def detect_triangle(request):
 
 
 def detect_square(request):
+    reset_session(request)
     square_form = TriangleAndSquareCDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["square_detection"] = request.POST
     else:
         request.session["square_detection"] = {}
     return render(request, "main/square.html", {"square_form": square_form})
+
+
+def detect_color(request):
+    reset_session(request)
+    # colors_form = ColorsDetectionForm(request.POST or None, request.FILES or None)
+    if request.method == 'POST':
+        request.session["color_detection"] = request.POST
+    else:
+        request.session["color_detection"] = {}
+    return render(request, "main/colors.html")  # , {"colors_form": colors_form})
