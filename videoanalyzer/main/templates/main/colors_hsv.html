@@ -5,9 +5,9 @@
     <h1>Colors by HSV DETECTION</h1>
     <img src="{% url 'feed' %}">
 
-<!--    <form action = "" method = "post">-->
-<!--        {% csrf_token %}-->
-<!--        {{colors_form.as_p }}-->
-<!--        <input type="submit" value="Submit">-->
-<!--    </form>-->
+    <form action = "" method = "post">
+        {% csrf_token %}
+        {{colors_form_hsv.as_p}}
+        <input type="submit" value="Submit">
+    </form>
 {% endblock %}

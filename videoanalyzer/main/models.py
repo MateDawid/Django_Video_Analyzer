@@ -1,16 +1,5 @@
 from django.db import models
-
-# DISPLAY_MODES = (
-#     ('clean', 'Clean'),
-#     ('shape', 'Shape'),
-#     ('color', 'Color'),
-#     ('color_and_shape', 'Color + Shape'),
-#     ('face', 'Face')
-# )
-#
-#
-# class DisplayModel(models.Model):
-#     display_mode = models.CharField(max_length=20, choices=DISPLAY_MODES, default='clean')
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class CircleDetectionModel(models.Model):
@@ -23,6 +12,15 @@ class CircleDetectionModel(models.Model):
 
 
 class TriangleAndSquareDetectionModel(models.Model):
-    kernelShape = models.IntegerField(default=4)
+    kernelShape = models.PositiveIntegerField(default=4)
     approximation = models.FloatField(default=0.02)
     maxArea = models.FloatField(default=400)
+
+
+class ColorHSVDetectionModel(models.Model):
+    min_hue = models.PositiveIntegerField(default=80, validators=[MaxValueValidator(359), MinValueValidator(0)])
+    min_saturation = models.PositiveIntegerField(default=20, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    min_value = models.PositiveIntegerField(default=20, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    max_hue = models.PositiveIntegerField(default=160, validators=[MaxValueValidator(359), MinValueValidator(0)])
+    max_saturation = models.PositiveIntegerField(default=100, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    max_value = models.PositiveIntegerField(default=100, validators=[MaxValueValidator(255), MinValueValidator(0)])

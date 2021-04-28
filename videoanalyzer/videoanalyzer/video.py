@@ -47,19 +47,19 @@ class VideoCamera:
         self.approximation = approximation
         self.maxArea = maxArea
         # Color detection by RGB variables
-        self.red_min = red_min,
-        self.green_min = green_min,
-        self.blue_min = blue_min,
-        self.red_max = red_max,
-        self.green_max = green_max,
-        self.blue_max = blue_max,
+        self.red_min = red_min
+        self.green_min = green_min
+        self.blue_min = blue_min
+        self.red_max = red_max
+        self.green_max = green_max
+        self.blue_max = blue_max
         # Color detection by HSV variables
-        self.hue_min = hue_min,
-        self.saturation_min = saturation_min,
-        self.value_min = value_min,
-        self.hue_max = hue_max,
-        self.saturation_max = saturation_max,
-        self.value_max = value_max,
+        self.hue_min = hue_min
+        self.saturation_min = saturation_min
+        self.value_min = value_min
+        self.hue_max = hue_max
+        self.saturation_max = saturation_max
+        self.value_max = value_max
 
     def __del__(self):
         self.video.release()
@@ -126,10 +126,11 @@ class VideoCamera:
         cv_hue = hue // 2
         cv_saturation = round(saturation * 2.55)
         cv_value = round(value * 2.55)
+
         return [cv_hue, cv_saturation, cv_value]
 
     def detect_color_by_hsv(self, image):
-        # For HSV, hue range is [0,179], saturation range is [0,255], and value range is [0,255].
+        # For HSV hue range is [0,179], saturation range is [0,255], and value range is [0,255].
         hsv_frame = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         given_min_hsv = self.count_hsv_values(self.hue_min, self.saturation_min, self.value_min)
         given_max_hsv = self.count_hsv_values(self.hue_max, self.saturation_max, self.value_max)
@@ -146,6 +147,7 @@ class VideoCamera:
         return hsv_color[0][0]
 
     def detect_color_by_rgb(self, image):
+        # For RGB red, green and blue range is [0,255].
         hsv_frame = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         low_range = np.array(self.convert_rgb_to_hsv(self.red_min, self.green_min, self.blue_min))
         high_range = np.array(self.convert_rgb_to_hsv(self.red_max, self.green_max, self.blue_max))
