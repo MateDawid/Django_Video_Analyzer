@@ -121,10 +121,20 @@ class VideoCamera:
                     if 0.95 <= circle_check < 1.05:
                         cv2.drawContours(image, [approx], 0, (0, 255, 0), -1)
 
+    @staticmethod
+    def count_hsv_values(hue, saturation, value):
+        cv_hue = hue // 2
+        cv_saturation = round(saturation * 2.55)
+        cv_value = round(value * 2.55)
+        return [cv_hue, cv_saturation, cv_value]
+
     def detect_color_by_hsv(self, image):
+        # For HSV, hue range is [0,179], saturation range is [0,255], and value range is [0,255].
         hsv_frame = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        low_range = np.array([40, 50, 50])
-        high_range = np.array([80, 255, 255])
+        given_min_hsv = self.count_hsv_values(self.hue_min, self.saturation_min, self.value_min)
+        given_max_hsv = self.count_hsv_values(self.hue_max, self.saturation_max, self.value_max)
+        low_range = np.array(given_min_hsv)
+        high_range = np.array(given_max_hsv)
         mask = cv2.inRange(hsv_frame, low_range, high_range)
         output = cv2.bitwise_and(image, image, mask=mask)
         return output
