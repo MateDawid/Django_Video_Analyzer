@@ -1,5 +1,5 @@
 from django import forms
-from .models import CircleDetectionModel, TriangleAndSquareDetectionModel, ColorHSVDetectionModel
+from .models import CircleDetectionModel, TriangleAndSquareDetectionModel, ColorHSVDetectionModel, ColorRGBDetectionModel
 
 
 class CircleDetectionForm(forms.ModelForm):
@@ -17,4 +17,10 @@ class TriangleAndSquareCDetectionForm(forms.ModelForm):
 class ColorHSVDetectionForm(forms.ModelForm):
     class Meta:
         model = ColorHSVDetectionModel
+        fields = '__all__'
+
+
+class ColorRGBDetectionForm(forms.ModelForm):
+    class Meta:
+        model = ColorRGBDetectionModel
         fields = '__all__'

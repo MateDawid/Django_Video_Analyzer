@@ -24,3 +24,13 @@ class ColorHSVDetectionModel(models.Model):
     max_hue = models.PositiveIntegerField(default=160, validators=[MaxValueValidator(359), MinValueValidator(0)])
     max_saturation = models.PositiveIntegerField(default=100, validators=[MaxValueValidator(255), MinValueValidator(0)])
     max_value = models.PositiveIntegerField(default=100, validators=[MaxValueValidator(255), MinValueValidator(0)])
+
+
+class ColorRGBDetectionModel(models.Model):
+    red_min = models.PositiveIntegerField(default=48, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    green_min = models.PositiveIntegerField(default=51, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    blue_min = models.PositiveIntegerField(default=41, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    red_max = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    green_max = models.PositiveIntegerField(default=255, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    blue_max = models.PositiveIntegerField(default=171, validators=[MaxValueValidator(255), MinValueValidator(0)])
+

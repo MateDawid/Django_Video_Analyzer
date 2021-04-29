@@ -1,10 +1,9 @@
 from django.shortcuts import render
 from django.views.decorators import gzip
-from django.views.generic import CreateView
 from django.http import StreamingHttpResponse
 from videoanalyzer.video import VideoCamera, gen
 
-from .forms import CircleDetectionForm, TriangleAndSquareCDetectionForm, ColorHSVDetectionForm
+from .forms import CircleDetectionForm, TriangleAndSquareCDetectionForm, ColorHSVDetectionForm, ColorRGBDetectionForm
 
 
 @gzip.gzip_page
@@ -59,7 +58,20 @@ def feed(request):
             request.session['color_detection_hsv'] = {}
         except:  # This is bad! replace it with proper handling
             print("HSV = Lack of camera")
-
+    elif request.session['color_detection_rgb'] != {}:
+        try:
+            data = request.session['color_detection_rgb']
+            cam = VideoCamera(colorDetection="RGB",
+                              red_min=int(data['red_min']),
+                              green_min=int(data['green_min']),
+                              blue_min=int(data['blue_min']),
+                              red_max=int(data['red_max']),
+                              green_max=int(data['green_max']),
+                              blue_max=int(data['blue_max']))
+            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+            request.session['color_detection_rgb'] = {}
+        except:  # This is bad! replace it with proper handling
+            print("RGB = Lack of camera")
     else:
         try:
             cam = VideoCamera()
@@ -129,9 +141,9 @@ def detect_color_by_hsv(request):
 
 def detect_color_by_rgb(request):
     reset_session(request)
-    # colors_form_rgb = RGBColorsDetectionForm(request.POST or None, request.FILES or None)
+    colors_form_rgb = ColorRGBDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["color_detection_rgb"] = request.POST
     else:
         request.session["color_detection_rgb"] = {}
-    return render(request, "main/colors_rgb.html")  # , {"colors_form_rgb": colors_form_rgb})
+    return render(request, "main/colors_rgb.html", {"colors_form_rgb": colors_form_rgb})
