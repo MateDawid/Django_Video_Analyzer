@@ -7,6 +7,7 @@ class VideoCamera:
             self,
             shape_detection=None,
             color_detection=None,
+            face_detection=None,
             # Circle detection
             dp=None,
             min_dist=None,
@@ -49,6 +50,7 @@ class VideoCamera:
         self.video = cv2.VideoCapture(0)
         self.shape_detection = shape_detection
         self.color_detection = color_detection
+        self.face_detection = face_detection
         # Circle detection variables
         self.dp = dp
         self.min_dist = min_dist
@@ -192,21 +194,27 @@ class VideoCamera:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         # Detect the faces
         faces = self.face_cascade.detectMultiScale(image=gray,
-                                                   scaleFactor=1.05,
-                                                   minNeighbors=6,
-                                                   minSize=(100, 100),
-                                                   maxSize=None)
+                                                   scaleFactor=self.face_scale_factor,
+                                                   minNeighbors=self.face_min_neighbors,
+                                                   minSize=None if self.face_min_size is None else (
+                                                       self.face_min_size, self.face_min_size),
+                                                   maxSize=None if self.face_min_size is None else (
+                                                       self.face_max_size, self.face_max_size))
         for (x, y, w, h) in faces:
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            if self.face_detection == "eyes":
+                self.detect_eyes(image, gray, x, y, w, h)
 
     def detect_eyes(self, image, gray_image, x, y, w, h):
         roi_gray = gray_image[y:y + h, x:x + w]
         roi_color = image[y:y + h, x:x + w]
         eyes = self.eye_cascade.detectMultiScale(image=roi_gray,
-                                                 scaleFactor=1.3,
-                                                 minNeighbors=5,
-                                                 minSize=None,
-                                                 maxSize=None)
+                                                 scaleFactor=self.eye_scale_factor,
+                                                 minNeighbors=self.eye_min_neighbors,
+                                                 minSize=None if self.eye_min_size is None else (
+                                                    self.eye_min_size, self.eye_min_size),
+                                                 maxSize=None if self.face_min_size is None else (
+                                                    self.eye_max_size, self.eye_max_size))
         for (ex, ey, ew, eh) in eyes:
             cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 0, 255), 2)
 
@@ -245,6 +253,9 @@ class VideoCamera:
         elif self.color_detection == "RGB":
             processed = self.detect_color_by_rgb(frame.copy())
 
+        elif self.face_detection == "face" or self.face_detection == "eyes":
+            processed = frame.copy()
+            self.detect_face(processed)
         else:
             processed = frame.copy()
 
@@ -257,7 +268,7 @@ class VideoCamera:
         input_text_w, input_text_h = VideoCamera.get_text_size('INPUT')
         output_text_w, output_text_h = VideoCamera.get_text_size('OUTPUT')
 
-        # displying texts backgrounds
+        # displaying texts backgrounds
 
         VideoCamera.display_text(output, 'INPUT', (0, 0), input_text_w, input_text_h)
         VideoCamera.display_text(output, 'OUTPUT', (width // 2, 0), output_text_w, output_text_h)
