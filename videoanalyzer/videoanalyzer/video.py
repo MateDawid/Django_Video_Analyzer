@@ -30,7 +30,9 @@ class VideoCamera:
             hue_max=None,
             saturation_max=None,
             value_max=None,
-
+            # Face detection
+            face_cascade=None,
+            eye_cascade=None
     ):
         self.video = cv2.VideoCapture(0)
         self.shapeDetection = shapeDetection
@@ -60,6 +62,9 @@ class VideoCamera:
         self.hue_max = hue_max
         self.saturation_max = saturation_max
         self.value_max = value_max
+        # Face detection variables
+        self.face_cascade = face_cascade
+        self.eye_cascade = eye_cascade
 
     def __del__(self):
         self.video.release()
@@ -154,6 +159,12 @@ class VideoCamera:
         mask = cv2.inRange(hsv_frame, low_range, high_range)
         output = cv2.bitwise_and(image, image, mask=mask)
         return output
+
+    def set_face_cascade(self):
+        self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+    def set_eye_cascade(self):
+        self.eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
     @staticmethod
     def get_text_size(text):
