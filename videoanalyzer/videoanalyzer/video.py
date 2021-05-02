@@ -166,6 +166,28 @@ class VideoCamera:
     def set_eye_cascade(self):
         self.eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
+    def detect_face(self, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # Detect the faces
+        faces = self.face_cascade.detectMultiScale(image=gray,
+                                                   scaleFactor=1.05,
+                                                   minNeighbors=6,
+                                                   minSize=(100, 100),
+                                                   maxSize=None)
+        for (x, y, w, h) in faces:
+            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    def detect_eyes(self, image, gray_image, x, y, w, h):
+        roi_gray = gray_image[y:y + h, x:x + w]
+        roi_color = image[y:y + h, x:x + w]
+        eyes = self.eye_cascade.detectMultiScale(image=roi_gray,
+                                                 scaleFactor=1.3,
+                                                 minNeighbors=5,
+                                                 minSize=None,
+                                                 maxSize=None)
+        for (ex, ey, ew, eh) in eyes:
+            cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 0, 255), 2)
+
     @staticmethod
     def get_text_size(text):
         text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, 1, 2)
