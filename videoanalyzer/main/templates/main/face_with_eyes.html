@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+{% block title %} DWA | Colors detection{% endblock %}
+
+{% block content %}
+    <h1>Face and eyes detection</h1>
+    <img src="{% url 'feed' %}">
+
+    <form action = "" method = "post">
+        {% csrf_token %}
+        {{face_with_eyes_form.as_p}}
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}

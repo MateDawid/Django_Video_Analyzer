@@ -191,6 +191,8 @@ class VideoCamera:
         self.eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
     def detect_face(self, image):
+        if self.face_cascade is None:
+            self.set_face_cascade()
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         # Detect the faces
         faces = self.face_cascade.detectMultiScale(image=gray,
@@ -198,7 +200,7 @@ class VideoCamera:
                                                    minNeighbors=self.face_min_neighbors,
                                                    minSize=None if self.face_min_size is None else (
                                                        self.face_min_size, self.face_min_size),
-                                                   maxSize=None if self.face_min_size is None else (
+                                                   maxSize=None if self.face_max_size is None else (
                                                        self.face_max_size, self.face_max_size))
         for (x, y, w, h) in faces:
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -206,6 +208,10 @@ class VideoCamera:
                 self.detect_eyes(image, gray, x, y, w, h)
 
     def detect_eyes(self, image, gray_image, x, y, w, h):
+        if self.face_cascade is None:
+            self.set_face_cascade()
+        if self.eye_cascade is None:
+            self.set_eye_cascade()
         roi_gray = gray_image[y:y + h, x:x + w]
         roi_color = image[y:y + h, x:x + w]
         eyes = self.eye_cascade.detectMultiScale(image=roi_gray,
@@ -213,7 +219,7 @@ class VideoCamera:
                                                  minNeighbors=self.eye_min_neighbors,
                                                  minSize=None if self.eye_min_size is None else (
                                                     self.eye_min_size, self.eye_min_size),
-                                                 maxSize=None if self.face_min_size is None else (
+                                                 maxSize=None if self.eye_max_size is None else (
                                                     self.eye_max_size, self.eye_max_size))
         for (ex, ey, ew, eh) in eyes:
             cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 0, 255), 2)
