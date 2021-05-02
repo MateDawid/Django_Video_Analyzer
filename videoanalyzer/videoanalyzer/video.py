@@ -5,17 +5,19 @@ import numpy as np
 class VideoCamera:
     def __init__(
             self,
-            shapeDetection=None,
-            colorDetection=None,
+            shape_detection=None,
+            color_detection=None,
             # Circle detection
-            dp=None, minDist=None,
-            param1=None, param2=None,
-            minRadius=None,
-            maxRadius=None,
+            dp=None,
+            min_dist=None,
+            param1=None,
+            param2=None,
+            min_radius=None,
+            max_radius=None,
             # Triangle/Square detection
-            kernelShape=None,
+            kernel_shape=None,
             approximation=None,
-            maxArea=None,
+            max_area=None,
             # Colors detection by RGB
             red_min=None,
             green_min=None,
@@ -30,24 +32,34 @@ class VideoCamera:
             hue_max=None,
             saturation_max=None,
             value_max=None,
-            # Face detection
+            # Face and eye cascades
             face_cascade=None,
-            eye_cascade=None
+            eye_cascade=None,
+            # Face detection
+            face_scale_factor=None,
+            face_min_neighbors=None,
+            face_min_size=None,
+            face_max_size=None,
+            # Eyes detection
+            eye_scale_factor=None,
+            eye_min_neighbors=None,
+            eye_min_size=None,
+            eye_max_size=None
     ):
         self.video = cv2.VideoCapture(0)
-        self.shapeDetection = shapeDetection
-        self.colorDetection = colorDetection
+        self.shape_detection = shape_detection
+        self.color_detection = color_detection
         # Circle detection variables
         self.dp = dp
-        self.minDist = minDist
+        self.min_dist = min_dist
         self.param1 = param1
         self.param2 = param2
-        self.minRadius = minRadius
-        self.maxRadius = maxRadius
+        self.min_radius = min_radius
+        self.max_radius = max_radius
         # Triangle/Square detection variables
-        self.kernelShape = kernelShape
+        self.kernel_shape = kernel_shape
         self.approximation = approximation
-        self.maxArea = maxArea
+        self.max_area = max_area
         # Color detection by RGB variables
         self.red_min = red_min
         self.green_min = green_min
@@ -62,9 +74,19 @@ class VideoCamera:
         self.hue_max = hue_max
         self.saturation_max = saturation_max
         self.value_max = value_max
-        # Face detection variables
+        # Face and eye cascade variables
         self.face_cascade = face_cascade
         self.eye_cascade = eye_cascade
+        # Face detection variables
+        self.face_scale_factor = face_scale_factor
+        self.face_min_neighbors = face_min_neighbors
+        self.face_min_size = face_min_size
+        self.face_max_size = face_max_size
+        # Eye detection variables
+        self.eye_scale_factor = eye_scale_factor
+        self.eye_min_neighbors = eye_min_neighbors
+        self.eye_min_size = eye_min_size
+        self.eye_max_size = eye_max_size
 
     def __del__(self):
         self.video.release()
@@ -78,11 +100,11 @@ class VideoCamera:
         detected_circles = cv2.HoughCircles(image=gray_blurred,
                                             method=cv2.HOUGH_GRADIENT,
                                             dp=self.dp,  # inverse resolution ratio
-                                            minDist=self.minDist,  # min distance between two circles centers
+                                            minDist=self.min_dist,  # min distance between two circles centers
                                             param1=self.param1,
                                             param2=self.param2,
-                                            minRadius=self.minRadius,
-                                            maxRadius=self.maxRadius)
+                                            minRadius=self.min_radius,
+                                            maxRadius=self.max_radius)
         if detected_circles is not None:
 
             # Convert the circle parameters a, b and r to round integers.
@@ -97,7 +119,7 @@ class VideoCamera:
 
     def find_contours(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        kernel = np.ones((self.kernelShape, self.kernelShape), np.uint8)
+        kernel = np.ones((self.kernel_shape, self.kernel_shape), np.uint8)
         erosion = cv2.erode(gray, kernel, iterations=1)
         dilation = cv2.dilate(erosion, kernel, iterations=1)
         blur = cv2.GaussianBlur(dilation, (5, 5), 0)
@@ -108,7 +130,7 @@ class VideoCamera:
     def detect_triangles(self, image):
         for cnt in self.find_contours(image):
             area = cv2.contourArea(cnt)
-            if area > self.maxArea:
+            if area > self.max_area:
                 epsilon = self.approximation * cv2.arcLength(cnt, True)
                 approx = cv2.approxPolyDP(cnt, epsilon, True)
                 if len(approx) == 3:
@@ -117,7 +139,7 @@ class VideoCamera:
     def detect_squares(self, image):
         for cnt in self.find_contours(image):
             area = cv2.contourArea(cnt)
-            if area > self.maxArea:
+            if area > self.max_area:
                 epsilon = self.approximation * cv2.arcLength(cnt, True)
                 approx = cv2.approxPolyDP(cnt, epsilon, True)
                 if len(approx) == 4:
@@ -205,22 +227,22 @@ class VideoCamera:
         width = int(self.video.get(3)) * 2
         height = int(self.video.get(4))
 
-        if self.shapeDetection == "circle":
+        if self.shape_detection == "circle":
             processed = frame.copy()
             self.detect_circles(processed)
 
-        elif self.shapeDetection == "triangle":
+        elif self.shape_detection == "triangle":
             processed = frame.copy()
             self.detect_triangles(processed)
 
-        elif self.shapeDetection == "square":
+        elif self.shape_detection == "square":
             processed = frame.copy()
             self.detect_squares(processed)
 
-        elif self.colorDetection == "HSV":
+        elif self.color_detection == "HSV":
             processed = self.detect_color_by_hsv(frame.copy())
 
-        elif self.colorDetection == "RGB":
+        elif self.color_detection == "RGB":
             processed = self.detect_color_by_rgb(frame.copy())
 
         else:

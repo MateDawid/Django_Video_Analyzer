@@ -4,17 +4,17 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class CircleDetectionModel(models.Model):
     dp = models.FloatField(default=1)
-    minDist = models.FloatField(default=20)
+    min_dist = models.FloatField(default=20)
     param1 = models.FloatField(default=50)
     param2 = models.FloatField(default=70)
-    minRadius = models.IntegerField(default=20)
-    maxRadius = models.IntegerField(default=100)
+    min_radius = models.IntegerField(default=20)
+    max_radius = models.IntegerField(default=100)
 
 
 class TriangleAndSquareDetectionModel(models.Model):
-    kernelShape = models.PositiveIntegerField(default=4)
+    kernel_shape = models.PositiveIntegerField(default=4)
     approximation = models.FloatField(default=0.02)
-    maxArea = models.FloatField(default=400)
+    max_area = models.FloatField(default=400)
 
 
 class ColorHSVDetectionModel(models.Model):
@@ -34,3 +34,16 @@ class ColorRGBDetectionModel(models.Model):
     green_max = models.PositiveIntegerField(default=255, validators=[MaxValueValidator(255), MinValueValidator(0)])
     blue_max = models.PositiveIntegerField(default=171, validators=[MaxValueValidator(255), MinValueValidator(0)])
 
+
+class FaceDetectionModel(models.Model):
+    face_scale_factor = models.FloatField(default=1.05)
+    face_min_neighbors = models.PositiveIntegerField(default=6)
+    face_min_size = models.PositiveIntegerField(default=100, null=True, blank=True)
+    face_max_size = models.PositiveIntegerField(null=True, blank=True)
+
+
+class EyesDetectionModel(FaceDetectionModel):
+    eye_scale_factor = models.FloatField(default=1.3)
+    eye_min_neighbors = models.PositiveIntegerField(default=5)
+    eye_min_size = models.PositiveIntegerField(null=True, blank=True)
+    eye_max_size = models.PositiveIntegerField(null=True, blank=True)

@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.views.decorators import gzip
 from django.http import StreamingHttpResponse
-from videoanalyzer.video import VideoCamera, gen
 
-from .forms import CircleDetectionForm, TriangleAndSquareCDetectionForm, ColorHSVDetectionForm, ColorRGBDetectionForm
+from videoanalyzer.video import VideoCamera, gen
+from .forms import CircleDetectionForm, TriangleAndSquareCDetectionForm, ColorHSVDetectionForm, \
+                    ColorRGBDetectionForm, FaceDetectionForm, EyesDetectionForm
 
 
 @gzip.gzip_page
@@ -11,13 +12,13 @@ def feed(request):
     if request.session['circle_detection'] != {}:
         try:
             data = request.session['circle_detection']
-            cam = VideoCamera(shapeDetection="circle",
+            cam = VideoCamera(shape_detection="circle",
                               dp=float(data['dp']),
-                              minDist=float(data['minDist']),
+                              min_dist=float(data['min_dist']),
                               param1=float(data['param1']),
                               param2=float(data['param2']),
-                              minRadius=int(data['minRadius']),
-                              maxRadius=int(data['maxRadius']))
+                              min_radius=int(data['min_radius']),
+                              max_radius=int(data['max_radius']))
             request.session['circle_detection'] = {}
             return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
         except:  # This is bad! replace it with proper handling
@@ -25,10 +26,10 @@ def feed(request):
     elif request.session['triangle_detection'] != {}:
         try:
             data = request.session['triangle_detection']
-            cam = VideoCamera(shapeDetection="triangle",
-                              kernelShape=int(data['kernelShape']),
+            cam = VideoCamera(shape_detection="triangle",
+                              kernel_shape=int(data['kernel_shape']),
                               approximation=float(data['approximation']),
-                              maxArea=float(data['maxArea']))
+                              max_area=float(data['max_area']))
             return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
             request.session['triangle_detection'] = {}
         except:  # This is bad! replace it with proper handling
@@ -36,10 +37,10 @@ def feed(request):
     elif request.session['square_detection'] != {}:
         try:
             data = request.session['square_detection']
-            cam = VideoCamera(shapeDetection="square",
-                              kernelShape=int(data['kernelShape']),
+            cam = VideoCamera(shape_detection="square",
+                              kernel_shape=int(data['kernel_shape']),
                               approximation=float(data['approximation']),
-                              maxArea=float(data['maxArea']))
+                              max_area=float(data['max_area']))
             return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
             request.session['square_detection'] = {}
         except:  # This is bad! replace it with proper handling
@@ -47,7 +48,7 @@ def feed(request):
     elif request.session['color_detection_hsv'] != {}:
         try:
             data = request.session['color_detection_hsv']
-            cam = VideoCamera(colorDetection="HSV",
+            cam = VideoCamera(color_detection="HSV",
                               hue_min=int(data['min_hue']),
                               saturation_min=int(data['min_saturation']),
                               value_min=int(data['min_saturation']),
@@ -61,7 +62,7 @@ def feed(request):
     elif request.session['color_detection_rgb'] != {}:
         try:
             data = request.session['color_detection_rgb']
-            cam = VideoCamera(colorDetection="RGB",
+            cam = VideoCamera(color_detection="RGB",
                               red_min=int(data['red_min']),
                               green_min=int(data['green_min']),
                               blue_min=int(data['blue_min']),
@@ -99,6 +100,8 @@ def reset_session(request):
     request.session["color_detection"] = {}
     request.session["color_detection_hsv"] = {}
     request.session["color_detection_rgb"] = {}
+    request.session["face_detection"] = {}
+    request.session["face_with_eyes_detection"] = {}
 
 
 def detect_circle(request):
@@ -114,8 +117,6 @@ def detect_triangle(request):
     triangle_form = TriangleAndSquareCDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["triangle_detection"] = request.POST
-    else:
-        request.session["triangle_detection"] = {}
     return render(request, "main/triangle.html", {"triangle_form": triangle_form})
 
 
@@ -124,8 +125,6 @@ def detect_square(request):
     square_form = TriangleAndSquareCDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["square_detection"] = request.POST
-    else:
-        request.session["square_detection"] = {}
     return render(request, "main/square.html", {"square_form": square_form})
 
 
@@ -134,8 +133,6 @@ def detect_color_by_hsv(request):
     colors_form_hsv = ColorHSVDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["color_detection_hsv"] = request.POST
-    else:
-        request.session["color_detection_hsv"] = {}
     return render(request, "main/colors_hsv.html", {"colors_form_hsv": colors_form_hsv})
 
 
@@ -144,6 +141,20 @@ def detect_color_by_rgb(request):
     colors_form_rgb = ColorRGBDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["color_detection_rgb"] = request.POST
-    else:
-        request.session["color_detection_rgb"] = {}
     return render(request, "main/colors_rgb.html", {"colors_form_rgb": colors_form_rgb})
+
+
+def detect_face(request):
+    reset_session(request)
+    face_form = FaceDetectionForm(request.POST or None, request.FILES or None)
+    if request.method == 'POST':
+        request.session["face_detection"] = request.POST
+    return render(request, "main/face_only.html", {"face_form": face_form})
+
+
+def detect_face_with_eyes(request):
+    reset_session(request)
+    face_with_eyes_form = EyesDetectionForm(request.POST or None, request.FILES or None)
+    if request.method == 'POST':
+        request.session["face_with_eyes_detection"] = request.POST
+    return render(request, "main/face_with_eyes.html", {"face_with_eyes_form": face_with_eyes_form})
