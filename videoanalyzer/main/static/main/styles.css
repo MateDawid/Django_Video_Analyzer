@@ -1,0 +1,24 @@
+body {
+    background-color: rgb(255, 255, 200);
+    font-family: monaco, Consolas, "Lucida Console", monospace !important;
+  }
+
+.button_list {
+    display: flex;
+    justify-content: space-around;
+}
+
+.button_list button {
+    min_width: 25vw;
+    font-family: monaco, Consolas, "Lucida Console", monospace !important;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.feed {
+    max-width:100vw;
+}
