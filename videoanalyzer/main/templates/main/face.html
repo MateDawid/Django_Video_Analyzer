@@ -3,7 +3,8 @@
 
 {% block content %}
     <h1>FACE DETECTION</h1>
-    <button onclick="location.href='{% url 'face_only' %}'" type="button">Face</button>
-    <button onclick="location.href='{% url 'face_with_eyes' %}'" type="button">Face and eyes</button>
-
+    <div class="vertical_buttons">
+        <button onclick="location.href='{% url 'face_only' %}'" type="button">Face</button>
+        <button onclick="location.href='{% url 'face_with_eyes' %}'" type="button">Face and eyes</button>
+    </div>
 {% endblock %}

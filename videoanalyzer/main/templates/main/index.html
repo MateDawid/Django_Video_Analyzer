@@ -1,6 +1,18 @@
-{% extends 'main/base.html' %}
-{% block title %} Django Webcam Analyzer {% endblock %}
-
-{% block content %}
-
-{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main/styles.css' %}">
+    <title>Django Video Analyzer</title>
+</head>
+<body>
+    <div class="vertical_buttons">
+        <div><button onclick="location.href='{% url 'home' %}'" type="button">HOME</button></div>
+        <div><button onclick="location.href='{% url 'shape' %}'" type="button">SHAPE</button></div>
+        <div><button onclick="location.href='{% url 'color' %}'" type="button">COLOR</button></div>
+        <div><button onclick="location.href='{% url 'face' %}'" type="button">FACE</button></div>
+    </div>
+</body>
+</html>

@@ -3,13 +3,28 @@ body {
     font-family: monaco, Consolas, "Lucida Console", monospace !important;
   }
 
-.button_list {
+.vertical_buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    height: 80vh;
+
+}
+.vertical_buttons button {
+    width: 40vw;
+    height: 15vh;
+    font-family: monaco, Consolas, "Lucida Console", monospace !important;
+}
+
+.horizontal_buttons {
     display: flex;
     justify-content: space-around;
 }
 
-.button_list button {
-    min_width: 25vw;
+.horizontal_buttons button {
+    width: 20vw;
+    height: 2vw;
     font-family: monaco, Consolas, "Lucida Console", monospace !important;
 }
 
@@ -20,5 +35,5 @@ body {
 }
 
 .feed {
-    max-width:100vw;
+    max-width:90vw;
 }
