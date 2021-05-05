@@ -1,6 +1,12 @@
+import numpy as np
+import cv2
+from PIL import Image
+import base64
+from io import BytesIO
+
 from django.shortcuts import render
 from django.views.decorators import gzip
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponse
 
 from videoanalyzer.video import VideoCamera, gen
 from .forms import CircleDetectionForm, TriangleAndSquareCDetectionForm, ColorHSVDetectionForm, \
@@ -167,7 +173,17 @@ def detect_color_by_rgb(request):
     colors_form_rgb = ColorRGBDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["color_detection_rgb"] = request.POST
-    return render(request, "main/colors_rgb.html", {"colors_form_rgb": colors_form_rgb})
+        data = request.POST
+        array_min = display_chosen_rgb_color(int(data['red_min']), int(data['green_min']), int(data['blue_min']))
+        array_max = display_chosen_rgb_color(int(data['red_max']), int(data['green_max']), int(data['blue_max']))
+    else:
+        array_min = display_chosen_rgb_color(255, 255, 255)
+        array_max = display_chosen_rgb_color(0, 0, 0)
+    image_min = convert_array_to_image(array_min)
+    image_max = convert_array_to_image(array_max)
+    rgb_min = convert_image_to_data_uri(image_min)
+    rgb_max = convert_image_to_data_uri(image_max)
+    return render(request, "main/colors_rgb.html", {"colors_form_rgb": colors_form_rgb, "rgb_min": rgb_min, "rgb_max": rgb_max})
 
 
 def detect_face(request):
@@ -184,3 +200,23 @@ def detect_face_with_eyes(request):
     if request.method == 'POST':
         request.session["face_with_eyes_detection"] = request.POST
     return render(request, "main/face_with_eyes.html", {"face_with_eyes_form": face_with_eyes_form})
+
+
+def display_chosen_rgb_color(red, green, blue):
+    # Create a blank 100x100 black image
+    image = np.zeros((100, 100, 3), np.uint8)
+    # Set each pixel to selected color
+    image[:] = (blue, green, red)
+    return image
+
+
+def convert_array_to_image(numpy_img):
+    img = Image.fromarray(numpy_img, 'RGB')
+    return img
+
+
+def convert_image_to_data_uri(pil_img):
+    data = BytesIO()
+    pil_img.save(data, "JPEG") # pick your format
+    data64 = base64.b64encode(data.getvalue())
+    return u'data:img/jpeg;base64,'+data64.decode('utf-8')
