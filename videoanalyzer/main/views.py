@@ -54,7 +54,7 @@ def feed(request):
             cam = VideoCamera(color_detection="HSV",
                               hue_min=int(data['min_hue']),
                               saturation_min=int(data['min_saturation']),
-                              value_min=int(data['min_saturation']),
+                              value_min=int(data['min_value']),
                               hue_max=int(data['max_hue']),
                               saturation_max=int(data['max_saturation']),
                               value_max=int(data['max_value']))
@@ -165,7 +165,21 @@ def detect_color_by_hsv(request):
     colors_form_hsv = ColorHSVDetectionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         request.session["color_detection_hsv"] = request.POST
-    return render(request, "main/colors_hsv.html", {"colors_form_hsv": colors_form_hsv})
+        data = request.POST
+        hsv_min = VideoCamera.count_hsv_values(int(data['min_hue']), int(data['min_saturation']), int(data['min_value']))
+        hsv_max = VideoCamera.count_hsv_values(int(data['max_hue']), int(data['max_saturation']), int(data['max_value']))
+        converted_min = convert_hsv_to_rgb(hsv_min[0], hsv_min[1], hsv_min[2])
+        converted_max = convert_hsv_to_rgb(hsv_max[0], hsv_max[1], hsv_max[2])
+        array_min = display_color(converted_min[2], converted_min[1], converted_min[0])
+        array_max = display_color(converted_max[2], converted_max[1], converted_max[0])
+    else:
+        array_min = display_color(255, 255, 255)
+        array_max = display_color(0, 0, 0)
+    image_min = convert_array_to_image(array_min)
+    image_max = convert_array_to_image(array_max)
+    rgb_min = convert_image_to_data_uri(image_min)
+    rgb_max = convert_image_to_data_uri(image_max)
+    return render(request, "main/colors_hsv.html", {"colors_form_hsv": colors_form_hsv, "rgb_min": rgb_min, "rgb_max": rgb_max})
 
 
 def detect_color_by_rgb(request):
@@ -174,11 +188,12 @@ def detect_color_by_rgb(request):
     if request.method == 'POST':
         request.session["color_detection_rgb"] = request.POST
         data = request.POST
-        array_min = display_chosen_rgb_color(int(data['red_min']), int(data['green_min']), int(data['blue_min']))
-        array_max = display_chosen_rgb_color(int(data['red_max']), int(data['green_max']), int(data['blue_max']))
+        print(data)
+        array_min = display_color(int(data['blue_min']), int(data['green_min']), int(data['red_min']))
+        array_max = display_color(int(data['blue_max']), int(data['green_max']), int(data['red_max']))
     else:
-        array_min = display_chosen_rgb_color(255, 255, 255)
-        array_max = display_chosen_rgb_color(0, 0, 0)
+        array_min = display_color(255, 255, 255)
+        array_max = display_color(0, 0, 0)
     image_min = convert_array_to_image(array_min)
     image_max = convert_array_to_image(array_max)
     rgb_min = convert_image_to_data_uri(image_min)
@@ -202,11 +217,11 @@ def detect_face_with_eyes(request):
     return render(request, "main/face_with_eyes.html", {"face_with_eyes_form": face_with_eyes_form})
 
 
-def display_chosen_rgb_color(red, green, blue):
+def display_color(blue, green, red):
     # Create a blank 100x100 black image
     image = np.zeros((100, 100, 3), np.uint8)
     # Set each pixel to selected color
-    image[:] = (blue, green, red)
+    image[:] = (red, green, blue)
     return image
 
 
@@ -217,6 +232,12 @@ def convert_array_to_image(numpy_img):
 
 def convert_image_to_data_uri(pil_img):
     data = BytesIO()
-    pil_img.save(data, "JPEG") # pick your format
+    pil_img.save(data, "JPEG")
     data64 = base64.b64encode(data.getvalue())
     return u'data:img/jpeg;base64,'+data64.decode('utf-8')
+
+
+def convert_hsv_to_rgb(hue, saturation, value):
+    hsv_color = np.uint8([[[hue, saturation, value]]])
+    rgb_color = cv2.cvtColor(hsv_color, cv2.COLOR_HSV2RGB)
+    return rgb_color[0][0]

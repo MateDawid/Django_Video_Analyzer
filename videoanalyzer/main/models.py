@@ -19,11 +19,11 @@ class TriangleAndSquareDetectionModel(models.Model):
 
 class ColorHSVDetectionModel(models.Model):
     min_hue = models.PositiveIntegerField(default=80, validators=[MaxValueValidator(359), MinValueValidator(0)])
-    min_saturation = models.PositiveIntegerField(default=20, validators=[MaxValueValidator(255), MinValueValidator(0)])
-    min_value = models.PositiveIntegerField(default=20, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    min_saturation = models.PositiveIntegerField(default=20, validators=[MaxValueValidator(100), MinValueValidator(0)])
+    min_value = models.PositiveIntegerField(default=20, validators=[MaxValueValidator(100), MinValueValidator(0)])
     max_hue = models.PositiveIntegerField(default=160, validators=[MaxValueValidator(359), MinValueValidator(0)])
-    max_saturation = models.PositiveIntegerField(default=100, validators=[MaxValueValidator(255), MinValueValidator(0)])
-    max_value = models.PositiveIntegerField(default=100, validators=[MaxValueValidator(255), MinValueValidator(0)])
+    max_saturation = models.PositiveIntegerField(default=100, validators=[MaxValueValidator(100), MinValueValidator(0)])
+    max_value = models.PositiveIntegerField(default=100, validators=[MaxValueValidator(100), MinValueValidator(0)])
 
 
 class ColorRGBDetectionModel(models.Model):
