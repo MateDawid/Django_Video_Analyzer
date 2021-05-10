@@ -2,9 +2,9 @@
 {% block title %} DWA | Colors detection{% endblock %}
 
 {% block content %}
-    <h1>COLOR DETECTION</h1>
     <div class="vertical_buttons">
-        <button onclick="location.href='{% url 'color_rgb' %}'" type="button">Detect by RGB</button>
-        <button onclick="location.href='{% url 'color_hsv' %}'" type="button">Detect by HSV</button>
+        <h1>COLOR DETECTION</h1>
+        <button onclick="location.href='{% url 'color_rgb' %}'" type="button">RGB</button>
+        <button onclick="location.href='{% url 'color_hsv' %}'" type="button">HSV</button>
     </div>
 {% endblock %}

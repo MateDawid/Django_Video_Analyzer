@@ -2,9 +2,9 @@
 {% block title %} DWA | Colors detection{% endblock %}
 
 {% block content %}
-    <h1>FACE DETECTION</h1>
     <div class="vertical_buttons">
-        <button onclick="location.href='{% url 'face_only' %}'" type="button">Face</button>
-        <button onclick="location.href='{% url 'face_with_eyes' %}'" type="button">Face and eyes</button>
+        <h1>FACE DETECTION</h1>
+        <button onclick="location.href='{% url 'face_only' %}'" type="button">FACE</button>
+        <button onclick="location.href='{% url 'face_with_eyes' %}'" type="button">FACE & EYES</button>
     </div>
 {% endblock %}
