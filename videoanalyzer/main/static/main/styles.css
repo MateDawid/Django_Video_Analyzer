@@ -63,6 +63,7 @@ button:hover {
     width: 20vw;
     height: 4vh;
     font-size: 2.5vh;
+    font-weight: bold;
     font-family: monaco, Consolas, "Lucida Console", monospace !important;
 }
 
@@ -74,15 +75,14 @@ button:hover {
 }
 
 .form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-height: 40vh;
-    max-width: 65vw;
+    flex: 1;
+    max-height: 20vh;
+    width: 65vw;
     border-color: black;
     border-style: dashed;
     border-width: 0.3vw;
     background-color: white;
+    padding: 1vw;
 }
 
 .feed {

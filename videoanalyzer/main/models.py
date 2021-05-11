@@ -36,7 +36,7 @@ class ColorRGBDetectionModel(models.Model):
 
 
 class FaceDetectionModel(models.Model):
-    face_scale_factor = models.FloatField(default=1.05)
+    face_scale_factor = models.FloatField(default=1.05, help_text='Help text')
     face_min_neighbors = models.PositiveIntegerField(default=6)
     face_min_size = models.PositiveIntegerField(default=100, null=True, blank=True)
     face_max_size = models.PositiveIntegerField(null=True, blank=True)
