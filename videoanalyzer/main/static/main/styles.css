@@ -74,19 +74,9 @@ button:hover {
     align-items: center;
 }
 
-.form {
-    flex: 1;
-    max-height: 20vh;
-    width: 65vw;
-    border-color: black;
-    border-style: dashed;
-    border-width: 0.3vw;
-    background-color: white;
-    padding: 1vw;
-}
-
 .feed {
     max-width:90vw;
+    max-height: 50vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -94,4 +84,44 @@ button:hover {
     border-style: dashed;
     border-width: 0.3vw;
     margin: 0.5vw;
+}
+
+.form {
+    flex: 1;
+    max-height: 30vh;
+    max-width: 65vw;
+    border-color: black;
+    border-style: dashed;
+    border-width: 0.3vw;
+    background-color: white;
+    padding: 1vw;
+    justify-content: center
+}
+
+.submit {
+   margin-top: 3vh;
+}
+
+.form_table {
+    min-width: 20vw;
+}
+
+.form_label {
+    font-weight: bold;
+}
+
+.form_hint {
+    display: none;
+    word-wrap: break-word;
+}
+
+.form_field:hover + .form_hint {
+  display: inline;
+  position: absolute;
+  background-color: white;
+  max-width: 20vw;
+  border-color: black;
+  border-style: dashed;
+  border-width: 0.3vw;
+  padding: 1vw;
 }

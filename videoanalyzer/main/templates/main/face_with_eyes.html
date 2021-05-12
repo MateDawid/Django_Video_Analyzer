@@ -5,20 +5,33 @@
     <h1>FACE & EYES DETECTION</h1>
     <img class="feed" src="{% url 'feed' %}">
 
+
+
     <div class="form">
         <form action = "" method = "post">
             {% csrf_token %}
-            {% for field in face_with_eyes_form %}
-            <div>
-                <p>{{field.name}}</p>
-                {{ field }}
-            </div>
+            <table class="form_table" align="center">
+                {% for field in face_with_eyes_form %}
+                    <tr>
+                        <td class="form_label">
+                            {{ field.errors }}
+                            {{ field.label_tag }}
+                        </td>
+                        <td class="form_field">
+                            {{ field }}
+                        </td>
+                        <td class="form_hint">
+                            Let's do this
+                        </td>
+                    </tr>
+                {% endfor %}
 
-            {% endfor %}
-            <input type="submit" value="Submit">
+            </table>
+            <input class="submit" type="submit" value="Submit">
         </form>
     </div>
-
+<!--    <div class="myDIV">Hover over me.</div>-->
+<!--    <div class="hide">I am shown when someone hovers over the div above.</div>-->
 
 
 {% endblock %}

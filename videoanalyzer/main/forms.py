@@ -37,3 +37,6 @@ class EyesDetectionForm(forms.ModelForm):
     class Meta:
         model = EyesDetectionModel
         fields = '__all__'
+        widgets = {
+            'face_scale_factor': forms.TextInput(attrs={'title': 'Face scale factor'})
+        }
