@@ -88,7 +88,7 @@ button:hover {
 
 .form {
     flex: 1;
-    max-height: 30vh;
+    max-height: 40vh;
     max-width: 65vw;
     border-color: black;
     border-style: dashed;
@@ -100,7 +100,29 @@ button:hover {
 
 .submit {
    margin-top: 3vh;
+   text-align: center;
 }
+
+.submit input {
+   display: inline-block;
+   background-color: white;
+   border-width: 0.2vw !important;
+   border-style: dotted !important;
+   border-color: black;
+   width: 20vw;
+   height: 4vh;
+   font-size: 2.5vh;
+   font-weight: bold;
+   font-color: black;
+   font-family: monaco, Consolas, "Lucida Console", monospace !important;
+   cursor: pointer;
+}
+
+input:hover {
+  background-color: black;
+  color: white;
+}
+
 
 .form_table {
     min-width: 20vw;
@@ -116,7 +138,7 @@ button:hover {
 }
 
 .form_field:hover + .form_hint {
-  display: inline;
+  display: block;
   position: absolute;
   background-color: white;
   max-width: 20vw;
