@@ -3,10 +3,8 @@
 ## Table of contents
 * [Screenshots](#screenshots)
 * [Technologies](#technologies)
-* [How it work?](#how-it-works)
 * [Setup](#setup)
 * [Features](#features)
-* [Status](#status)
 * [Contact](#contact)
 
 ## Screenshots
@@ -47,7 +45,5 @@ To install and run app you will need to:
 * Detecting color set in RGB or HSV scale,
 * Detecting faces and eyes.
 
-## Status
-Ready to use.
 ## Contact
 Created by [@matedawid](https://linkedin.com/in/matedawid) - if you have any questions, just contact me!
