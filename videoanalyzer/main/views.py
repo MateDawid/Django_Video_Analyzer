@@ -218,8 +218,8 @@ def detect_face_with_eyes(request):
 
 
 def display_color(blue, green, red):
-    # Create a blank 100x100 black image
-    image = np.zeros((100, 100, 3), np.uint8)
+    # Create a blank 10x10 black image
+    image = np.zeros((50, 50, 3), np.uint8)
     # Set each pixel to selected color
     image[:] = (red, green, blue)
     return image

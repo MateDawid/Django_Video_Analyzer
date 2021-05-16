@@ -4,9 +4,6 @@
 {% block content %}
     <h1>FACE & EYES DETECTION</h1>
     <img class="feed" src="{% url 'feed' %}">
-
-
-
     <div class="form">
         <form action = "" method = "post">
             {% csrf_token %}
@@ -21,7 +18,7 @@
                             {{ field }}
                         </td>
                         <td class="form_hint">
-                            Let's do this
+                            {{ field.help_text }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -32,8 +29,4 @@
             </div>
         </form>
     </div>
-<!--    <div class="myDIV">Hover over me.</div>-->
-<!--    <div class="hide">I am shown when someone hovers over the div above.</div>-->
-
-
 {% endblock %}

@@ -4,10 +4,28 @@
 {% block content %}
     <h1>Square DETECTION</h1>
     <img class="feed" src="{% url 'feed' %}">
-
-    <form action = "" method = "post">
-        {% csrf_token %}
-        {{square_form.as_p }}
-        <input type="submit" value="Submit">
-    </form>
+    <div class="form">
+        <form action = "" method = "post">
+            {% csrf_token %}
+            <table class="form_table" align="center">
+                {% for field in square_form %}
+                    <tr>
+                        <td class="form_label">
+                            {{ field.errors }}
+                            {{ field.label_tag }}
+                        </td>
+                        <td class="form_field">
+                            {{ field }}
+                        </td>
+                        <td class="form_hint">
+                            {{ field.help_text }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <div class="submit">
+                <input type="submit" value="APPLY">
+            </div>
+        </form>
+    </div>
 {% endblock %}
