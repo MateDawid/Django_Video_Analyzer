@@ -10,103 +10,79 @@ from django.http import StreamingHttpResponse, HttpResponse
 
 from videoanalyzer.video import VideoCamera, gen
 from .forms import CircleDetectionForm, TriangleAndSquareCDetectionForm, ColorHSVDetectionForm, \
-                    ColorRGBDetectionForm, FaceDetectionForm, EyesDetectionForm
+    ColorRGBDetectionForm, FaceDetectionForm, EyesDetectionForm
 
 
 @gzip.gzip_page
 def feed(request):
     if request.session['circle_detection'] != {}:
-        try:
-            data = request.session['circle_detection']
-            cam = VideoCamera(shape_detection="circle",
-                              dp=float(data['dp']),
-                              min_dist=float(data['min_dist']),
-                              param1=float(data['param1']),
-                              param2=float(data['param2']),
-                              min_radius=int(data['min_radius']),
-                              max_radius=int(data['max_radius']))
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            print("Circle = Lack of camera")
+        data = request.session['circle_detection']
+        cam = VideoCamera(shape_detection="circle",
+                          dp=float(data['dp']),
+                          min_dist=float(data['min_dist']),
+                          param1=float(data['param1']),
+                          param2=float(data['param2']),
+                          min_radius=int(data['min_radius']),
+                          max_radius=int(data['max_radius']))
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     elif request.session['triangle_detection'] != {}:
-        try:
-            data = request.session['triangle_detection']
-            cam = VideoCamera(shape_detection="triangle",
-                              kernel_shape=int(data['kernel_shape']),
-                              approximation=float(data['approximation']),
-                              max_area=float(data['max_area']))
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            print("Triangle = Lack of camera")
+        data = request.session['triangle_detection']
+        cam = VideoCamera(shape_detection="triangle",
+                          kernel_shape=int(data['kernel_shape']),
+                          approximation=float(data['approximation']),
+                          max_area=float(data['max_area']))
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     elif request.session['square_detection'] != {}:
-        try:
-            data = request.session['square_detection']
-            cam = VideoCamera(shape_detection="square",
-                              kernel_shape=int(data['kernel_shape']),
-                              approximation=float(data['approximation']),
-                              max_area=float(data['max_area']))
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            print("Square = Lack of camera")
+        data = request.session['square_detection']
+        cam = VideoCamera(shape_detection="square",
+                          kernel_shape=int(data['kernel_shape']),
+                          approximation=float(data['approximation']),
+                          max_area=float(data['max_area']))
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     elif request.session['color_detection_hsv'] != {}:
-        try:
-            data = request.session['color_detection_hsv']
-            cam = VideoCamera(color_detection="HSV",
-                              hue_min=int(data['min_hue']),
-                              saturation_min=int(data['min_saturation']),
-                              value_min=int(data['min_value']),
-                              hue_max=int(data['max_hue']),
-                              saturation_max=int(data['max_saturation']),
-                              value_max=int(data['max_value']))
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            print("HSV = Lack of camera")
+        data = request.session['color_detection_hsv']
+        cam = VideoCamera(color_detection="HSV",
+                          hue_min=int(data['min_hue']),
+                          saturation_min=int(data['min_saturation']),
+                          value_min=int(data['min_value']),
+                          hue_max=int(data['max_hue']),
+                          saturation_max=int(data['max_saturation']),
+                          value_max=int(data['max_value']))
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     elif request.session['color_detection_rgb'] != {}:
-        try:
-            data = request.session['color_detection_rgb']
-            cam = VideoCamera(color_detection="RGB",
-                              red_min=int(data['red_min']),
-                              green_min=int(data['green_min']),
-                              blue_min=int(data['blue_min']),
-                              red_max=int(data['red_max']),
-                              green_max=int(data['green_max']),
-                              blue_max=int(data['blue_max']))
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            print("RGB = Lack of camera")
+        data = request.session['color_detection_rgb']
+        cam = VideoCamera(color_detection="RGB",
+                          red_min=int(data['red_min']),
+                          green_min=int(data['green_min']),
+                          blue_min=int(data['blue_min']),
+                          red_max=int(data['red_max']),
+                          green_max=int(data['green_max']),
+                          blue_max=int(data['blue_max']))
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     elif request.session['face_detection'] != {}:
-        print(request.session['face_detection'])
-        try:
-            data = request.session['face_detection']
-            cam = VideoCamera(face_detection="face",
-                              face_scale_factor=float(data['face_scale_factor']),
-                              face_min_neighbors=int(data['face_min_neighbors']),
-                              face_min_size=None if data['face_min_size'] == "" else int(data['face_min_size']),
-                              face_max_size=None if data['face_max_size'] == "" else int(data['face_max_size']))
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            print("Face = Lack of camera")
+        data = request.session['face_detection']
+        cam = VideoCamera(face_detection="face",
+                          face_scale_factor=float(data['face_scale_factor']),
+                          face_min_neighbors=int(data['face_min_neighbors']),
+                          face_min_size=None if data['face_min_size'] == "" else int(data['face_min_size']),
+                          face_max_size=None if data['face_max_size'] == "" else int(data['face_max_size']))
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+
     elif request.session['face_with_eyes_detection'] != {}:
-        try:
-            data = request.session['face_with_eyes_detection']
-            cam = VideoCamera(face_detection="eyes",
-                              face_scale_factor=float(data['face_scale_factor']),
-                              face_min_neighbors=int(data['face_min_neighbors']),
-                              face_min_size=None if data['face_min_size'] == "" else int(data['face_min_size']),
-                              face_max_size=None if data['face_max_size'] == "" else int(data['face_max_size']),
-                              eye_scale_factor=float(data['eye_scale_factor']),
-                              eye_min_neighbors=int(data['eye_min_neighbors']),
-                              eye_min_size=None if data['eye_min_size'] == "" else int(data['eye_min_size']),
-                              eye_max_size=None if data['eye_max_size'] == "" else int(data['eye_max_size']))
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            print("Face = Lack of camera")
+        data = request.session['face_with_eyes_detection']
+        cam = VideoCamera(face_detection="eyes",
+                          face_scale_factor=float(data['face_scale_factor']),
+                          face_min_neighbors=int(data['face_min_neighbors']),
+                          face_min_size=None if data['face_min_size'] == "" else int(data['face_min_size']),
+                          face_max_size=None if data['face_max_size'] == "" else int(data['face_max_size']),
+                          eye_scale_factor=float(data['eye_scale_factor']),
+                          eye_min_neighbors=int(data['eye_min_neighbors']),
+                          eye_min_size=None if data['eye_min_size'] == "" else int(data['eye_min_size']),
+                          eye_max_size=None if data['eye_max_size'] == "" else int(data['eye_max_size']))
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     else:
-        try:
-            cam = VideoCamera()
-            return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-        except:  # This is bad! replace it with proper handling
-            print("Lack of camera")
+        cam = VideoCamera()
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
 
 
 def home(request):
@@ -166,8 +142,10 @@ def detect_color_by_hsv(request):
     if request.method == 'POST':
         request.session["color_detection_hsv"] = request.POST
         data = request.POST
-        hsv_min = VideoCamera.count_hsv_values(int(data['min_hue']), int(data['min_saturation']), int(data['min_value']))
-        hsv_max = VideoCamera.count_hsv_values(int(data['max_hue']), int(data['max_saturation']), int(data['max_value']))
+        hsv_min = VideoCamera.count_hsv_values(int(data['min_hue']), int(data['min_saturation']),
+                                               int(data['min_value']))
+        hsv_max = VideoCamera.count_hsv_values(int(data['max_hue']), int(data['max_saturation']),
+                                               int(data['max_value']))
         converted_min = convert_hsv_to_rgb(hsv_min[0], hsv_min[1], hsv_min[2])
         converted_max = convert_hsv_to_rgb(hsv_max[0], hsv_max[1], hsv_max[2])
         array_min = display_color(converted_min[2], converted_min[1], converted_min[0])
@@ -179,7 +157,8 @@ def detect_color_by_hsv(request):
     image_max = convert_array_to_image(array_max)
     rgb_min = convert_image_to_data_uri(image_min)
     rgb_max = convert_image_to_data_uri(image_max)
-    return render(request, "main/colors_hsv.html", {"colors_form_hsv": colors_form_hsv, "rgb_min": rgb_min, "rgb_max": rgb_max})
+    return render(request, "main/colors_hsv.html",
+                  {"colors_form_hsv": colors_form_hsv, "rgb_min": rgb_min, "rgb_max": rgb_max})
 
 
 def detect_color_by_rgb(request):
@@ -198,7 +177,8 @@ def detect_color_by_rgb(request):
     image_max = convert_array_to_image(array_max)
     rgb_min = convert_image_to_data_uri(image_min)
     rgb_max = convert_image_to_data_uri(image_max)
-    return render(request, "main/colors_rgb.html", {"colors_form_rgb": colors_form_rgb, "rgb_min": rgb_min, "rgb_max": rgb_max})
+    return render(request, "main/colors_rgb.html",
+                  {"colors_form_rgb": colors_form_rgb, "rgb_min": rgb_min, "rgb_max": rgb_max})
 
 
 def detect_face(request):
@@ -234,7 +214,7 @@ def convert_image_to_data_uri(pil_img):
     data = BytesIO()
     pil_img.save(data, "JPEG")
     data64 = base64.b64encode(data.getvalue())
-    return u'data:img/jpeg;base64,'+data64.decode('utf-8')
+    return u'data:img/jpeg;base64,' + data64.decode('utf-8')
 
 
 def convert_hsv_to_rgb(hue, saturation, value):

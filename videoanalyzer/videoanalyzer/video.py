@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 
 
 class VideoCamera:
@@ -237,56 +238,61 @@ class VideoCamera:
         cv2.putText(image, text, (x, y + text_height), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
 
     def get_frame(self):
-        _, frame = self.video.read()
-        width = int(self.video.get(3)) * 2
-        height = int(self.video.get(4))
+        cam_check, frame = self.video.read()
+        if cam_check:
+            width = int(self.video.get(3)) * 2
+            height = int(self.video.get(4))
 
-        if self.shape_detection == "circle":
-            processed = frame.copy()
-            self.detect_circles(processed)
+            if self.shape_detection == "circle":
+                processed = frame.copy()
+                self.detect_circles(processed)
 
-        elif self.shape_detection == "triangle":
-            processed = frame.copy()
-            self.detect_triangles(processed)
+            elif self.shape_detection == "triangle":
+                processed = frame.copy()
+                self.detect_triangles(processed)
 
-        elif self.shape_detection == "square":
-            processed = frame.copy()
-            self.detect_squares(processed)
+            elif self.shape_detection == "square":
+                processed = frame.copy()
+                self.detect_squares(processed)
 
-        elif self.color_detection == "HSV":
-            processed = self.detect_color_by_hsv(frame.copy())
+            elif self.color_detection == "HSV":
+                processed = self.detect_color_by_hsv(frame.copy())
 
-        elif self.color_detection == "RGB":
-            processed = self.detect_color_by_rgb(frame.copy())
+            elif self.color_detection == "RGB":
+                processed = self.detect_color_by_rgb(frame.copy())
 
-        elif self.face_detection == "face" or self.face_detection == "eyes":
-            processed = frame.copy()
-            self.detect_face(processed)
+            elif self.face_detection == "face" or self.face_detection == "eyes":
+                processed = frame.copy()
+                self.detect_face(processed)
+            else:
+                processed = frame.copy()
+
+            output = np.zeros((height, width, frame.shape[2]), np.uint8)
+            output[:height, :width // 2] = frame
+            output[:height, width // 2:] = processed
+
+            # getting texts sizes
+
+            input_text_w, input_text_h = VideoCamera.get_text_size('INPUT')
+            output_text_w, output_text_h = VideoCamera.get_text_size('OUTPUT')
+
+            # displaying texts backgrounds
+
+            VideoCamera.display_text(output, 'INPUT', (0, 0), input_text_w, input_text_h)
+            VideoCamera.display_text(output, 'OUTPUT', (width // 2, 0), output_text_w, output_text_h)
+
+            # extract image to .jpg format
+            _, jpeg = cv2.imencode('.jpg', output)
+
+            return jpeg.tobytes()
         else:
-            processed = frame.copy()
-
-        output = np.zeros((height, width, frame.shape[2]), np.uint8)
-        output[:height, :width // 2] = frame
-        output[:height, width // 2:] = processed
-
-        # getting texts sizes
-
-        input_text_w, input_text_h = VideoCamera.get_text_size('INPUT')
-        output_text_w, output_text_h = VideoCamera.get_text_size('OUTPUT')
-
-        # displaying texts backgrounds
-
-        VideoCamera.display_text(output, 'INPUT', (0, 0), input_text_w, input_text_h)
-        VideoCamera.display_text(output, 'OUTPUT', (width // 2, 0), output_text_w, output_text_h)
-
-        # extract image to .jpg format
-        _, jpeg = cv2.imencode('.jpg', output)
-
-        return jpeg.tobytes()
-
+            return 0
 
 def gen(camera):
-    while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+    if camera.get_frame() != 0:
+        while True:
+            frame = camera.get_frame()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+    else:
+        return 0
